@@ -395,3 +395,119 @@ func IfNewVar(a, b int) string {
 }
 
 ```
+
+## 组合优于继承
+
+#### Go 中的结构体、接口和组合
+
+##### 结构体 (Structs)
+
+结构体是用于封装不同类型数据的复合类型。
+
+```go
+type Person struct {
+    Name string
+    Age  int
+}
+```
+
+创建结构体实例
+
+```go
+p1 := &Person{Name: "Alice", Age: 30} // 返回指针
+p2 := Person{"Bob", 25}
+p3 := new(Person) // 返回指针
+```
+
+遇事不决，用指针
+
+##### 结构体方法
+
+可以给结构体定义方法。
+
+```go
+func (p Person) Speak() {
+    fmt.Println("Hi, my name is", p.Name)
+}
+```
+
+#### 接口 (Interfaces)
+
+接口是方法签名的集合。当一个类型提供了接口的所有方法，我们说它实现了该接口。
+
+```go
+type Speaker interface {
+	Speak()
+}
+```
+
+接口实现
+一个类型实现了接口，意味着这个类型定义了接口声明的所有方法。
+
+```go
+func (p Person) Speak() {
+	fmt.Println("Hi, my name is", p.Name)
+}
+```
+
+```go
+// Person 实现了 Speaker 接口
+var s Speaker = Person{Name: "Alice", Age: 30}
+s.Speak()
+```
+
+##### 结构体和接口的组合
+
+组合是通过在结构体中嵌入一个或多个已存在的类型（可以是结构体或接口），从而将它们的实现方法和属性融入到新的结构体。
+
+结构体组合
+外部结构体可以通过组合一个或多个内部结构体（匿名字段），来获得它们的所有字段和方法。
+
+```go
+type Employee struct {
+	Person
+	Position string
+	Salary float64
+}
+```
+
+```go
+func (e Employee) Work() {
+	fmt.Println(e.Name, "is working.")
+}
+```
+
+使用组合的方法和字段
+
+```go
+e := Employee{Person: Person{Name: "Bob", Age: 35}, Position: "Engineer", Salary: 80000}
+e.Speak() // Output: Hi, my name is Bob
+e.Work() // Output: Bob is working.
+```
+
+接口组合
+结构体可以包含一个或多个接口类型作为匿名字段。这允许结构体“代理”接口的方法调用到实际的实现对象。
+
+```go
+type Manager struct {
+	Employee
+	io.Reader
+}
+
+// 实现 io.Reader 接口的 Read 方法
+func (m Manager) Read(p []byte) (n int, err error) {
+	// ...
+	return
+}
+```
+
+#### 注意点
+
+如果外部结构体和内部结构体有方法重名，外部结构体的方法会“覆盖”内部结构体的同名方法。
+当外部结构体没有定义自己的同名方法时，内部结构体的方法可以被“提升”到外部结构体上。
+
+## 泛型
+
+### 泛型约束
+
+也就是说，基本的泛型约束，约束对象必须是个接口，然后传入的 struct 必须满足接口中定义的方法
