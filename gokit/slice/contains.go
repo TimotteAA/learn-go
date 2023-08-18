@@ -20,14 +20,18 @@ func ContainsFunc[T any](s []T, equa func(src T) bool) bool {
 
 // 判断src中是否存在dest中的任何一个元素
 func ContainsAny[T comparable](src, dest []T) bool {
-
+	return ContainsAnyFunc[T](src, dest, func(src, dest T) bool {
+		return src == dest
+	})
 }
 
-func ContainsAnyFunc[T any](src []T, equal func(src T) bool) bool {
-	for _, val := range src {
-		if equal(val) {
-			return true;
+func ContainsAnyFunc[T any](src, dst []T, equal equalFunc[T]) bool {
+	for _, valDst := range dst {
+		for _, valSrc := range src {
+			if equal(valSrc, valDst) {
+				return true
+			}
 		}
 	}
-	return false;
+	return false
 }
