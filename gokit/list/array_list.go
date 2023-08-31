@@ -36,8 +36,8 @@ func (a *ArrayList[T]) Add(idx int, val T) error {
 	return nil
 }
 
-func (a *ArrayList[T]) Append(val T) error {
-	a.vals = append(a.vals, val)
+func (a *ArrayList[T]) Append(val ...T) error {
+	a.vals = append(a.vals, val...)
 	return nil
 }
 
@@ -47,6 +47,31 @@ func (a *ArrayList[T]) Set(idx int, val T) error {
 	}
 	a.vals[idx] = val
 	return nil
+}
+
+// 使用具名返回值，默认返回零值
+func (a *ArrayList[T]) Get(idx int) (t T, err error) {
+	if idx < 0 || idx >= a.Len() {
+		err = internal.NewErrorIndexOutOfRange(idx, a.Len())
+		return
+	}
+	t = a.vals[idx]
+	return 
+}
+
+func (a *ArrayList[T]) Delete(idx int) (t T,  err error) {
+	if idx < 0 || idx >= a.Len() {
+		err = internal.NewErrorIndexOutOfRange(idx, a.Len())
+		return
+	}
+	t = a.vals[idx]
+	for i := idx; i < a.Len() - 1; i++ {
+		a.vals[i] = a.vals[i + 1]
+	}
+	// 删除最后一个元素
+	a.vals = a.vals[:a.Len() - 1]
+
+	return t, err
 }
 
 func (a *ArrayList[T]) Len() int {
